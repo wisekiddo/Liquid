@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Liquid</string>
+    <string name="preparing_list">Preparing the List..</string>
+    <string name="navigation_view_header_title">Users</string>
+    <string name="list_title">My List</string>
+</resources>

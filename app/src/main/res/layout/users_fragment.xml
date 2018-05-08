@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.wisekiddo.liquid.feature.users.UsersRefreshLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/refresh_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <RelativeLayout
+        android:id="@+id/usersContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:id="@+id/usersLayout"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/filteringLabel"
+                android:text = "@string/list_title"
+                android:textStyle="bold"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:gravity="left"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/list_user_padding"
+                android:layout_marginRight="@dimen/list_user_padding"
+                android:layout_marginTop="@dimen/activity_vertical_margin"
+                android:layout_marginBottom="@dimen/activity_vertical_margin" />
+
+            <ListView
+                android:id="@+id/users_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/noUsers"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/noUsersMain"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/preparing_list"
+                android:layout_marginBottom="@dimen/list_user_padding" />
+
+
+        </LinearLayout>
+    </RelativeLayout>
+</com.wisekiddo.liquid.feature.users.UsersRefreshLayout>
+
