@@ -20,6 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.wisekiddo.liquid.feature.albums.AlbumsActivity" />
+        <activity android:name="com.wisekiddo.liquid.feature.photos.PhotosActivity" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
