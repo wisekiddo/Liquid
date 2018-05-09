@@ -2,5 +2,9 @@
     <string name="app_name">Liquid</string>
     <string name="preparing_list">Preparing the List..</string>
     <string name="navigation_view_header_title">Users</string>
-    <string name="list_title">My List</string>
+    <string name="user_list_title">User List</string>
+    <string name="album_list_title">Albums</string>
+    <string name="photo_list_title">Photos</string>
+    <string name="settings_menu_title">Settings</string>
+    <string name="home_menu_title">Home</string>
 </resources>

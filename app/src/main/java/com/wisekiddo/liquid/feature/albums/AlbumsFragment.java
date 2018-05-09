@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +58,7 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
     AlbumListener albumListener = new AlbumListener() {
         @Override
         public void onClickAlbum(Album clickedAlbum) {
-            presenter.openDetails(clickedAlbum);
+            presenter.openPhotos(clickedAlbum);
         }
     };
 
@@ -70,7 +71,7 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
     @Override
     public void onResume() {
         super.onResume();
-        presenter.takeView(this);
+        presenter.generateView(this);
     }
 
     @Override
@@ -143,6 +144,8 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
 
     @Override
     public void showAlbums(List<Album> albums) {
+
+        Log.i("---SHOWALBUMS","0000");
         listAdapter.replaceData(albums);
 
         linearLayout.setVisibility(View.VISIBLE);
@@ -165,11 +168,9 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
     }
 
     @Override
-    public void showDetailsUi(Integer userId) {
-        //Shown in it's own Activity, since it makes more sense that way
-        // and it gives us the flexibility to show some Intent stubbing.
+    public void showPhotos(Integer albumId) {
         Intent intent = new Intent(getContext(), AlbumsActivity.class);
-        intent.putExtra(AlbumsActivity.EXTRA_ITEM_ID, userId.toString());
+        intent.putExtra(AlbumsActivity.EXTRA_ITEM_ID, albumId.toString());
         startActivity(intent);
     }
 

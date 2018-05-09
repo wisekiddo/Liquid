@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,7 +68,7 @@ public class UsersFragment extends DaggerFragment implements UsersContract.View 
     @Override
     public void onResume() {
         super.onResume();
-        presenter.takeView(this);
+        presenter.generateView(this);
     }
 
     @Override
@@ -85,6 +86,8 @@ public class UsersFragment extends DaggerFragment implements UsersContract.View 
     UserListener userListener = new UserListener() {
         @Override
         public void onUserClick(User clickedUser) {
+            Log.e("909090909","000000");
+
             presenter.openAlbums(clickedUser);
         }
     };
@@ -183,8 +186,6 @@ public class UsersFragment extends DaggerFragment implements UsersContract.View 
 
     @Override
     public void showAlbums(Integer userId) {
-        //Shown in it's own Activity, since it makes more sense that way
-        // and it gives us the flexibility to show some Intent stubbing.
         Intent intent = new Intent(getContext(), AlbumsActivity.class);
         intent.putExtra(AlbumsActivity.EXTRA_ITEM_ID, userId.toString());
         startActivity(intent);

@@ -56,6 +56,8 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
 
     @Override
     public void reload(boolean forceUpdate) {
+        Log.i("--->","--");
+
         // Simplification for sample: a network reload will be forced on first load.
         loadAlbums(forceUpdate || firstLoad, true);
         firstLoad = false;
@@ -107,26 +109,27 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
         }
     }
 
-
     private void processEmptyAlbums() {
         albumsView.showNoList();
     }
 
-
-
     @Override
-    public void openDetails(@NonNull Album requestedUser) {
-
+    public void openPhotos(@NonNull Album requestedAlbum) {
+        checkNotNull(requestedAlbum, "requestedAlbum cannot be null!");
+        if (albumsView != null) {
+            albumsView.showPhotos(requestedAlbum.getId());
+        }
     }
 
     @Override
-    public void takeView(AlbumsContract.View view) {
-
+    public void generateView(AlbumsContract.View view) {
+        albumsView = view;
+        reload(false);
     }
 
     @Override
     public void dropView() {
-
+        albumsView = null;
     }
 
 }

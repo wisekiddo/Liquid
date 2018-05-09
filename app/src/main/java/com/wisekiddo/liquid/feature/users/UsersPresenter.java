@@ -1,6 +1,7 @@
 package com.wisekiddo.liquid.feature.users;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.wisekiddo.liquid.data.model.User;
 import com.wisekiddo.liquid.data.source.Repository;
@@ -45,16 +46,6 @@ final class UsersPresenter implements UsersContract.Presenter {
         compositeDisposable = new CompositeDisposable();
     }
 
-    //@Override
-    public void subscribe() {
-       // loadTasks(false);
-    }
-
-   // @Override
-    public void unsubscribe() {
-        compositeDisposable.clear();
-    }
-
     @Override
     public void loadUsers(boolean forceUpdate) {
         // Simplification for sample: a network reload will be forced on first load.
@@ -73,7 +64,6 @@ final class UsersPresenter implements UsersContract.Presenter {
         }
 
         EspressoIdlingResource.increment(); // App is busy until further notice
-
         compositeDisposable.clear();
         Disposable disposable = repository
                 .getUsers()
@@ -116,13 +106,13 @@ final class UsersPresenter implements UsersContract.Presenter {
     public void openAlbums(@NonNull User requestedUser) {
         checkNotNull(requestedUser, "requestedUser cannot be null!");
         if (usersView != null) {
-           usersView.showAlbums(requestedUser.getId());
+            usersView.showAlbums(requestedUser.getId());
         }
     }
 
 
     @Override
-    public void takeView(UsersContract.View view) {
+    public void generateView(UsersContract.View view) {
         this.usersView = view;
         loadUsers(false);
     }

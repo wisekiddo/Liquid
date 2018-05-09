@@ -5,9 +5,11 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.wisekiddo.liquid.data.model.Album;
+import com.wisekiddo.liquid.data.model.Photo;
 import com.wisekiddo.liquid.data.model.User;
 import com.wisekiddo.liquid.data.source.DataSource;
 import com.wisekiddo.liquid.data.source.local.dao.AlbumsDao;
+import com.wisekiddo.liquid.data.source.local.dao.PhotosDao;
 import com.wisekiddo.liquid.data.source.local.dao.UsersDao;
 
 import java.util.List;
@@ -33,19 +35,25 @@ public class LocalDataSource implements DataSource {
 
     private final UsersDao usersDao;
     private final AlbumsDao albumsDao;
+    private final PhotosDao photosDao;
 
     @Nullable
     private static LocalDataSource INSTANCE;
 
     @Inject
-    public LocalDataSource(@NonNull UsersDao userDao, @NonNull AlbumsDao albumDao) {
+    public LocalDataSource(@NonNull UsersDao userDao,
+                           @NonNull AlbumsDao albumDao,
+                           @NonNull PhotosDao photoDao) {
         usersDao = userDao;
         albumsDao = albumDao;
+        photosDao = photoDao;
     }
 
-    public static LocalDataSource getInstance(UsersDao userDao,AlbumsDao albumDao) {
+    public static LocalDataSource getInstance(UsersDao userDao,
+                                              AlbumsDao albumDao,
+                                              PhotosDao photoDao) {
         if (INSTANCE == null) {
-            INSTANCE = new LocalDataSource(userDao, albumDao);
+            INSTANCE = new LocalDataSource(userDao, albumDao, photoDao);
         }
         return INSTANCE;
     }
@@ -68,7 +76,13 @@ public class LocalDataSource implements DataSource {
     public Flowable<List<Album>> getAlbums(@NonNull Integer userId) {return  albumsDao.getAlbums(userId);}
 
     @Override
-    public Flowable<Album> getAlbum(@NonNull Integer userId) {return albumsDao.getAlbumsByUser(userId);}
+    public Flowable<Album> getAlbum(@NonNull Integer id) {return albumsDao.getAlbumsById(0);}
+
+    @Override
+    public Flowable<List<Photo>> getPhotos(@NonNull Integer albumId) {return  photosDao.getPhotos(albumId);}
+
+    @Override
+    public Flowable<Photo> getPhoto(@NonNull Integer id) {return photosDao.getPhotosById(0);}
 
     @Override
     public void saveUser(@NonNull final User user) {
@@ -102,7 +116,21 @@ public class LocalDataSource implements DataSource {
         });
     }
 
-
+    @Override
+    public void savePhoto(@NonNull final Photo photo) {
+        checkNotNull(photo);
+        Observable.fromCallable(new Callable<Void>() {
+            @Override
+            public Void call() throws Exception {
+                try {
+                    photosDao.insertAlbum(photo);
+                } catch (Exception e) {
+                    Log.e(this.getClass().getSimpleName(),e.getMessage());
+                }
+                return null;
+            }
+        });
+    }
 
 
     @Override
@@ -111,6 +139,10 @@ public class LocalDataSource implements DataSource {
 
     @Override
     public void refreshAlbums() {
+    }
+
+    @Override
+    public void refreshPhotos() {
     }
 
     @Override
@@ -130,7 +162,7 @@ public class LocalDataSource implements DataSource {
     }
 
     @Override
-    public void deleteUser(@NonNull final Integer taskId) {
+    public void deleteUser(@NonNull final Integer userId) {
 
         Observable.fromCallable(new Callable<Void>() {
             @Override
@@ -144,4 +176,5 @@ public class LocalDataSource implements DataSource {
             }
         });
     }
+
 }

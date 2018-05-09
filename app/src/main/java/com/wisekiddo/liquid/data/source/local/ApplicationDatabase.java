@@ -4,8 +4,10 @@ import android.arch.persistence.room.Database;
 import android.arch.persistence.room.RoomDatabase;
 
 import com.wisekiddo.liquid.data.model.Album;
+import com.wisekiddo.liquid.data.model.Photo;
 import com.wisekiddo.liquid.data.model.User;
 import com.wisekiddo.liquid.data.source.local.dao.AlbumsDao;
+import com.wisekiddo.liquid.data.source.local.dao.PhotosDao;
 import com.wisekiddo.liquid.data.source.local.dao.UsersDao;
 
 /**
@@ -14,9 +16,11 @@ import com.wisekiddo.liquid.data.source.local.dao.UsersDao;
  * The Room ApplicationDatabase that contains the User table.
  */
 
-@Database(entities = {User.class, Album.class}, version = 1)
+@Database(entities = {User.class, Album.class, Photo.class}, version = 1)
 public abstract class ApplicationDatabase extends RoomDatabase {
 
     public abstract UsersDao usersDao();
     public abstract AlbumsDao albumDao();
+    public abstract PhotosDao photosDao();
+
 }

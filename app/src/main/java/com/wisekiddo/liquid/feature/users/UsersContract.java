@@ -36,7 +36,7 @@ public interface UsersContract {
 
         void openAlbums(@NonNull User requestedUser);
 
-        void takeView(UsersContract.View view);
+        void generateView(UsersContract.View view);
 
         void dropView();
     }

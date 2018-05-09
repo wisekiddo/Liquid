@@ -5,6 +5,6 @@ package com.wisekiddo.liquid.root;
  */
 
 public interface BasePresenter<T> {
-    void takeView(T view);
+    void generateView(T view);
     void dropView();
 }

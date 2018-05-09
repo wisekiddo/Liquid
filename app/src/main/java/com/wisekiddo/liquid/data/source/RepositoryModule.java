@@ -5,6 +5,7 @@ import android.arch.persistence.room.Room;
 
 import com.wisekiddo.liquid.data.source.local.ApplicationDatabase;
 import com.wisekiddo.liquid.data.source.local.dao.AlbumsDao;
+import com.wisekiddo.liquid.data.source.local.dao.PhotosDao;
 import com.wisekiddo.liquid.data.source.local.dao.UsersDao;
 import com.wisekiddo.liquid.data.source.local.Local;
 import com.wisekiddo.liquid.data.source.local.LocalDataSource;
@@ -29,8 +30,8 @@ public class RepositoryModule {
     @Singleton
     @Provides
     @Local
-    DataSource provideLocalDataSource(UsersDao usersDao, AlbumsDao albumDao) {
-        return new LocalDataSource(usersDao,albumDao);
+    DataSource provideLocalDataSource(UsersDao usersDao, AlbumsDao albumDao, PhotosDao photoDao) {
+        return new LocalDataSource(usersDao,albumDao,photoDao);
     }
 
     @Singleton
@@ -57,6 +58,12 @@ public class RepositoryModule {
     @Provides
     AlbumsDao provideAlbumDao(ApplicationDatabase db) {
         return db.albumDao();
+    }
+
+    @Singleton
+    @Provides
+    PhotosDao providePhotoDao(ApplicationDatabase db) {
+        return db.photosDao();
     }
 
     @Singleton

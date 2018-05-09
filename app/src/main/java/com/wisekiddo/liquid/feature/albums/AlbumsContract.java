@@ -22,7 +22,7 @@ public interface AlbumsContract {
 
         void showAlbums(List<Album> albums);
 
-        void showDetailsUi(Integer userId);
+        void showPhotos(Integer userId);
 
         void showLoadingError();
 
@@ -33,9 +33,10 @@ public interface AlbumsContract {
 
         void reload(boolean forceUpdate);
 
-        void openDetails(@NonNull Album requestedUser);
+        void openPhotos(@NonNull Album requestedAlbums);
 
-        void takeView(AlbumsContract.View view);
+
+        void generateView(AlbumsContract.View view);
 
         void dropView();
     }

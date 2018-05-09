@@ -6,6 +6,7 @@ import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.wisekiddo.liquid.data.model.Album;
+import com.wisekiddo.liquid.data.model.Photo;
 import com.wisekiddo.liquid.data.model.User;
 import com.wisekiddo.liquid.data.source.local.Local;
 import com.wisekiddo.liquid.data.source.remote.Remote;
@@ -40,6 +41,10 @@ public class Repository implements DataSource {
     Map<Integer, Album> cachedAlbums;
 
     @VisibleForTesting
+    @Nullable
+    Map<Integer, Photo> cachedPhotos;
+
+    @VisibleForTesting
     boolean cacheIsDirty = false;
 
     @Inject
@@ -61,28 +66,9 @@ public class Repository implements DataSource {
     }
 
 
-    @Override
-    public Flowable<List<User>> getUsers() {
-        // Respond immediately with cache if available and not dirty
-        if (cachedUsers != null && !cacheIsDirty) {
-            return Flowable.fromIterable(cachedUsers.values()).toList().toFlowable();
-        } else if (cachedUsers == null) {
-            cachedUsers = new LinkedHashMap<>();
-        }
-
-        Flowable<List<User>> remoteUsers = getAndSaveRemoteUsers();
-
-        if (cacheIsDirty) {
-            return remoteUsers;
-        } else {
-            // Query the local storage if available. If not, query the network.
-            Flowable<List<User>> localUsers = getAndCacheLocalUsers();
-            return Flowable.concat(localUsers, remoteUsers)
-                    .filter(users -> !users.isEmpty())
-                    .firstOrError()
-                    .toFlowable();
-        }
-    }
+    //************************************************//
+    //                  FOR Users                     //
+    //************************************************//
     private Flowable<List<User>> getAndCacheLocalUsers() {
         return localDataSource.getUsers()
                 .flatMap(users -> Flowable.fromIterable(users)
@@ -111,6 +97,29 @@ public class Repository implements DataSource {
             cachedUsers = new LinkedHashMap<>();
         }
         cachedUsers.put(user.getId(), user);
+    }
+
+    @Override
+    public Flowable<List<User>> getUsers() {
+        // Respond immediately with cache if available and not dirty
+        if (cachedUsers != null && !cacheIsDirty) {
+            return Flowable.fromIterable(cachedUsers.values()).toList().toFlowable();
+        } else if (cachedUsers == null) {
+            cachedUsers = new LinkedHashMap<>();
+        }
+
+        Flowable<List<User>> remoteUsers = getAndSaveRemoteUsers();
+
+        if (cacheIsDirty) {
+            return remoteUsers;
+        } else {
+            // Query the local storage if available. If not, query the network.
+            Flowable<List<User>> localUsers = getAndCacheLocalUsers();
+            return Flowable.concat(localUsers, remoteUsers)
+                    .filter(users -> !users.isEmpty())
+                    .firstOrError()
+                    .toFlowable();
+        }
     }
 
     @Override
@@ -192,6 +201,7 @@ public class Repository implements DataSource {
     @Override
     public Flowable<List<Album>> getAlbums(@NonNull Integer userId) {
         // Respond immediately with cache if available and not dirty
+        Log.i("---------->","0");
         if (cachedAlbums != null && !cacheIsDirty) {
             return Flowable.fromIterable(cachedAlbums.values()).toList().toFlowable();
         } else if (cachedAlbums == null) {
@@ -219,20 +229,17 @@ public class Repository implements DataSource {
                         .doOnNext(album -> {
                             cachedAlbums.put(album.getId(), album);
                             Log.e("LOCAL_REPOSITORY", album.getTitle());
-                        })
-                        .toList()
-                        .toFlowable());
+                        }).toList().toFlowable());
     }
 
     private Flowable<List<Album>> getAndSaveRemoteAlbums(@NonNull Integer userId) {
-        return remoteDataSource
-                .getAlbums(userId)
-                .flatMap(albums -> Flowable.fromIterable(albums).doOnNext(album -> {
-                    localDataSource.saveAlbum(album);
-                    cachedAlbums.put(album.getId(), album);
-                    Log.e("REMOTE_REPOSITORY", album.getTitle());
-
-                }).toList().toFlowable())
+        return remoteDataSource.getAlbums(userId)
+                .flatMap(albums -> Flowable.fromIterable(albums)
+                        .doOnNext(album -> {
+                            localDataSource.saveAlbum(album);
+                            cachedAlbums.put(album.getId(), album);
+                            Log.e("REMOTE_REPOSITORY", album.getTitle());
+                        }).toList().toFlowable())
                 .doOnComplete(() -> cacheIsDirty = false);
     }
 
@@ -294,6 +301,115 @@ public class Repository implements DataSource {
 
     @Override
     public void refreshAlbums() {
+        cacheIsDirty = true;
+    }
+
+
+
+    //************************************************//
+    //                  FOR Photos                    //
+    //************************************************//
+
+    @Override
+    public Flowable<List<Photo>> getPhotos(@NonNull Integer albumId) {
+        // Respond immediately with cache if available and not dirty
+        if (cachedPhotos != null && !cacheIsDirty) {
+            return Flowable.fromIterable(cachedPhotos.values()).toList().toFlowable();
+        } else if (cachedPhotos == null) {
+            cachedPhotos = new LinkedHashMap<>();
+        }
+
+        Flowable<List<Photo>> remotePhotos = getAndSaveRemotePhotos(albumId);
+
+        if (cacheIsDirty) {
+            return remotePhotos;
+        } else {
+            // Query the local storage if available. If not, query the network.
+            Flowable<List<Photo>> localPhotos = getAndCacheLocalPhotos(albumId);
+
+            return Flowable.concat(localPhotos, remotePhotos)
+                    .filter(photos -> !photos.isEmpty())
+                    .firstOrError()
+                    .toFlowable();
+        }
+    }
+
+    private Flowable<List<Photo>> getAndCacheLocalPhotos(@NonNull Integer albumId) {
+        return localDataSource.getPhotos(albumId)
+                .flatMap(photos -> Flowable.fromIterable(photos)
+                        .doOnNext(photo -> {
+                            cachedPhotos.put(photo.getId(), photo);
+                        }).toList().toFlowable());
+    }
+
+    private Flowable<List<Photo>> getAndSaveRemotePhotos(@NonNull Integer albumId) {
+        return remoteDataSource.getPhotos(albumId)
+                .flatMap(photos -> Flowable.fromIterable(photos)
+                        .doOnNext(photo -> {
+                            localDataSource.savePhoto(photo);
+                            cachedPhotos.put(photo.getId(), photo);
+                        }).toList().toFlowable())
+                .doOnComplete(() -> cacheIsDirty = false);
+    }
+
+    @Override
+    public Flowable<Photo> getPhoto(@NonNull Integer id) {
+        checkNotNull(id);
+
+        final Photo cachedPhoto = getPhotoWithId(id);
+
+        if (cachedPhoto != null) {
+            return Flowable.just(cachedPhoto);
+        }
+
+        if (cachedPhotos == null) {
+            cachedPhotos = new LinkedHashMap<>();
+        }
+
+        Flowable<Photo> localPhoto= getPhotoWithIdFromLocalRepository(id);
+        Flowable<Photo> remotePhoto = remoteDataSource.getPhoto(id).doOnNext(photo -> {
+            if (photo != null) {
+                localDataSource.savePhoto(photo);
+                cachedPhotos.put(photo.getId(), photo);
+            }
+        });
+
+        return Flowable.concat(localPhoto, remotePhoto)
+                .firstElement()
+                .toFlowable();
+    }
+
+    @Override
+    public void savePhoto(@NonNull Photo photo) {
+        checkNotNull(photo);
+        remoteDataSource.savePhoto(photo);
+        localDataSource.savePhoto(photo);
+
+        if (cachedPhotos == null) {
+            cachedPhotos = new LinkedHashMap<>();
+        }
+        cachedPhotos.put(photo.getId(), photo);
+    }
+
+    @Nullable
+    private Photo getPhotoWithId(@NonNull Integer id) {
+        checkNotNull(id);
+        if (cachedPhotos == null || cachedPhotos.isEmpty()) {
+            return null;
+        } else {
+            return cachedPhotos.get(id);
+        }
+    }
+
+    @NonNull
+    private Flowable<Photo> getPhotoWithIdFromLocalRepository(@NonNull final Integer id) {
+        return localDataSource
+                .getPhoto(id)
+                .firstElement().toFlowable();
+    }
+
+    @Override
+    public void refreshPhotos() {
         cacheIsDirty = true;
     }
 }

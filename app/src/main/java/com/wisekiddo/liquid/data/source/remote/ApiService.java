@@ -1,6 +1,7 @@
 package com.wisekiddo.liquid.data.source.remote;
 
 import com.wisekiddo.liquid.data.model.Album;
+import com.wisekiddo.liquid.data.model.Photo;
 import com.wisekiddo.liquid.data.model.User;
 
 import java.util.List;
@@ -25,8 +26,11 @@ public interface ApiService {
     @GET("users/")
     Flowable<List<User>> getUsers();
 
-    @GET("albums{userId}")
+    @GET("albums")
     Flowable<List<Album>> getAlbums(
             @Query("userId") Integer id);
 
+    @GET("photo")
+    Flowable<List<Photo>> getPhotos(
+            @Query("albumId") Integer id);
 }

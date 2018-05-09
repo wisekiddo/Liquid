@@ -24,8 +24,9 @@ public interface AlbumsDao {
     @Query("SELECT * FROM Album WHERE userId = :userId")
     Flowable<List<Album>> getAlbums(Integer userId);
 
+    //Future use
     @Query("SELECT * FROM Album WHERE id = :userId")
-    Flowable<Album> getAlbumsByUser(Integer userId);
+    Flowable<Album> getAlbumsById(Integer userId);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAlbum(Album album);
