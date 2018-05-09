@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -99,8 +100,8 @@ public class PhotosFragment extends DaggerFragment implements PhotosContract.Vie
         View root = inflater.inflate(R.layout.photos_fragment, container, false);
 
         // Set up users view
-        ListView listView = root.findViewById(R.id.photos_list);
-        listView.setAdapter(listAdapter);
+        GridView gridView = root.findViewById(R.id.photos_list);
+        gridView.setAdapter(listAdapter);
         //mFilteringLabelView = root.findViewById(R.id.filteringLabel);
         linearLayout = root.findViewById(R.id.photosLayout);
 
@@ -116,7 +117,7 @@ public class PhotosFragment extends DaggerFragment implements PhotosContract.Vie
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(listView);
+        swipeRefreshLayout.setScrollUpChild(gridView);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
