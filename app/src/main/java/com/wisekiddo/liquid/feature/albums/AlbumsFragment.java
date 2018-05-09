@@ -241,10 +241,6 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
             TextView titleView = rowView.findViewById(R.id.title);
             titleView.setText(album.getTitle().trim());
 
-            TextView descriptionView = rowView.findViewById(R.id.description);
-            descriptionView.setText(album.getTitle());
-
-
             rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

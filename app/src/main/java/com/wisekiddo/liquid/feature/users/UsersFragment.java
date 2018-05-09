@@ -86,8 +86,6 @@ public class UsersFragment extends DaggerFragment implements UsersContract.View 
     UserListener userListener = new UserListener() {
         @Override
         public void onUserClick(User clickedUser) {
-            Log.e("909090909","000000");
-
             presenter.openAlbums(clickedUser);
         }
     };
@@ -238,15 +236,14 @@ public class UsersFragment extends DaggerFragment implements UsersContract.View 
 
             final User user = getItem(i);
 
-            TextView titleView = rowView.findViewById(R.id.title);
+            TextView titleView = rowView.findViewById(R.id.name);
             titleView.setText(user.getName().trim());
 
-            TextView descriptionView = rowView.findViewById(R.id.description);
+            TextView descriptionView = rowView.findViewById(R.id.username);
             descriptionView.setText(user.getUsername());
 
-            TextView price = rowView.findViewById(R.id.price);
-            String strPrice = "none";
-            price.setText(strPrice);
+            TextView price = rowView.findViewById(R.id.phone);
+            price.setText(user.getPhone());
 
             //ImageView imageView = rowView.findViewById(R.id.image);
            // Picasso.get().load(BASE_IMAGE_URL+user.getImg().getName())
