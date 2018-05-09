@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.wisekiddo.liquid.R;
 import com.wisekiddo.liquid.data.model.Album;
+import com.wisekiddo.liquid.feature.photos.PhotosActivity;
 import com.wisekiddo.liquid.root.ActivityScoped;
 
 import java.util.ArrayList;
@@ -169,8 +170,8 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
 
     @Override
     public void showPhotos(Integer albumId) {
-        Intent intent = new Intent(getContext(), AlbumsActivity.class);
-        intent.putExtra(AlbumsActivity.EXTRA_ITEM_ID, albumId.toString());
+        Intent intent = new Intent(getContext(), PhotosActivity.class);
+        intent.putExtra(PhotosActivity.EXTRA_ITEM_ID, albumId.toString());
         startActivity(intent);
     }
 
