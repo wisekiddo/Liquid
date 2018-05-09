@@ -194,8 +194,6 @@ public class UsersFragment extends DaggerFragment implements UsersContract.View 
 
         private List<User> mUsers;
         private UserListener mUserListener;
-        private static final String BASE_IMAGE_URL = "http://media.redmart.com/newmedia/200p";
-
 
         public UsersAdapter(List<User> users, UserListener userListener) {
             setList(users);

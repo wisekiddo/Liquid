@@ -11,10 +11,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.Picasso;
 import com.wisekiddo.liquid.R;
 import com.wisekiddo.liquid.data.model.Photo;
 import com.wisekiddo.liquid.feature.photos.PhotosActivity;
@@ -105,7 +108,6 @@ public class PhotosFragment extends DaggerFragment implements PhotosContract.Vie
         noView = root.findViewById(R.id.noPhotos);
         mNoMainView = root.findViewById(R.id.noPhotosMain);
 
-
         // Set up progress indicator
         final PhotosRefreshLayout swipeRefreshLayout = root.findViewById(R.id.refresh_layout);
         swipeRefreshLayout.setColorSchemeColors(
@@ -149,10 +151,7 @@ public class PhotosFragment extends DaggerFragment implements PhotosContract.Vie
 
     @Override
     public void showPhotos(List<Photo> photos) {
-
-        Log.i("---SHOWALBUMS","0000");
         listAdapter.replaceData(photos);
-
         linearLayout.setVisibility(View.VISIBLE);
         noView.setVisibility(View.GONE);
     }
@@ -194,8 +193,6 @@ public class PhotosFragment extends DaggerFragment implements PhotosContract.Vie
 
         private List<Photo> mPhotos;
         private PhotoListener mPhotoListener;
-        private static final String BASE_IMAGE_URL = "http://media.redmart.com/newmedia/200p";
-
 
         public PhotoAdapter(List<Photo> photos, PhotoListener photoListener) {
             setList(photos);
@@ -242,6 +239,10 @@ public class PhotosFragment extends DaggerFragment implements PhotosContract.Vie
             TextView descriptionView = rowView.findViewById(R.id.description);
             descriptionView.setText(photo.getTitle());
 
+            ImageView imageView = rowView.findViewById(R.id.image);
+            Picasso.get().load(photo.getUrl())
+                    .memoryPolicy(MemoryPolicy.NO_STORE)
+                    .into(imageView);
 
             rowView.setOnClickListener(new View.OnClickListener() {
                 @Override
