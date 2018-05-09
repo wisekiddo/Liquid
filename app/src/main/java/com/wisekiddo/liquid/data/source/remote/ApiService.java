@@ -19,7 +19,7 @@ public interface ApiService {
 
 
 
-    @GET("user/{id}")
+    @GET("user_cardview/{id}")
     Flowable<User> getUser(
             @Path("id") int id);
 

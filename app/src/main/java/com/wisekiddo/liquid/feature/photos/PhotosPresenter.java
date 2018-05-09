@@ -22,7 +22,6 @@ import io.reactivex.disposables.Disposable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
 /**
  * *Created by ronald on 28/4/18.
  */
@@ -42,7 +41,6 @@ final class PhotosPresenter implements PhotosContract.Presenter {
     private boolean firstLoad = true;
 
     private String albumId;
-
 
     @NonNull
     private CompositeDisposable compositeDisposable;

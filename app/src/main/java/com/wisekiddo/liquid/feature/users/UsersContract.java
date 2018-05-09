@@ -23,7 +23,7 @@ public interface UsersContract {
 
         void showUsers(List<User> users);
 
-        void showAlbums(Integer userId);
+        void showAlbums(User user);
 
         void showLoadingUsersError();
 

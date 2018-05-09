@@ -15,7 +15,7 @@ import dagger.android.support.DaggerAppCompatActivity;
 /**
  * Created by ronald on 28/4/18.
  *
- * Displays user details screen.
+ * Displays user_cardview details screen.
  */
 
 public class PhotosActivity extends DaggerAppCompatActivity {

@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -75,7 +74,7 @@ public class UsersFragment extends DaggerFragment implements UsersContract.View 
     public void onDestroy() {
         super.onDestroy();
         presenter.dropView();  //prevent leaking activity in
-        // case presenter is orchestrating a long running user
+        // case presenter is orchestrating a long running user_cardview
     }
 
     @Override
@@ -183,9 +182,9 @@ public class UsersFragment extends DaggerFragment implements UsersContract.View 
 
 
     @Override
-    public void showAlbums(Integer userId) {
+    public void showAlbums(User user) {
         Intent intent = new Intent(getContext(), AlbumsActivity.class);
-        intent.putExtra(AlbumsActivity.EXTRA_ITEM_ID, userId.toString());
+        intent.putExtra(AlbumsActivity.EXTRA_ITEM_ID, user.getId().toString());
         startActivity(intent);
     }
 
@@ -229,7 +228,7 @@ public class UsersFragment extends DaggerFragment implements UsersContract.View 
             View rowView = view;
             if (rowView == null) {
                 LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-                rowView = inflater.inflate(R.layout.user, viewGroup, false);
+                rowView = inflater.inflate(R.layout.user_cardview, viewGroup, false);
             }
 
             final User user = getItem(i);
@@ -240,13 +239,8 @@ public class UsersFragment extends DaggerFragment implements UsersContract.View 
             TextView descriptionView = rowView.findViewById(R.id.username);
             descriptionView.setText(user.getUsername());
 
-            TextView price = rowView.findViewById(R.id.phone);
-            price.setText(user.getPhone());
-
-            //ImageView imageView = rowView.findViewById(R.id.image);
-           // Picasso.get().load(BASE_IMAGE_URL+user.getImg().getName())
-            //        .memoryPolicy(MemoryPolicy.NO_STORE)
-            //        .into(imageView);
+            TextView phone = rowView.findViewById(R.id.phone);
+            phone.setText(user.getPhone());
 
 
             rowView.setOnClickListener(new View.OnClickListener() {

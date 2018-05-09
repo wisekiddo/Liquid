@@ -4,7 +4,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.google.common.base.Optional;
 import com.wisekiddo.liquid.data.model.Album;
+import com.wisekiddo.liquid.data.model.User;
 import com.wisekiddo.liquid.data.source.Repository;
 import com.wisekiddo.liquid.root.ActivityScoped;
 import com.wisekiddo.liquid.util.EspressoIdlingResource;
@@ -40,26 +42,26 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
 
     private boolean firstLoad = true;
 
-    private String albumId;
+    private String userId;
 
 
     @NonNull
     private CompositeDisposable compositeDisposable;
 
     @Inject
-    AlbumsPresenter(@Nullable String albumId, Repository repository) {
+    AlbumsPresenter(@Nullable String userId, Repository repository) {
         this.repository = repository;
-        this.albumId = albumId;
+        this.userId = userId;
         compositeDisposable = new CompositeDisposable();
     }
 
 
     @Override
     public void reload(boolean forceUpdate) {
-        Log.i("--->","--");
-
         // Simplification for sample: a network reload will be forced on first load.
         loadAlbums(forceUpdate || firstLoad, true);
+        getSelectedUser();
+
         firstLoad = false;
     }
 
@@ -77,7 +79,7 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
 
         compositeDisposable.clear();
         Disposable disposable = repository
-                .getAlbums(Integer.parseInt(albumId))
+                .getAlbums(Integer.parseInt(userId))
                 .flatMap(Flowable::fromIterable)
                 .toList()
                 .subscribeOn(schedulerProvider.io())
@@ -90,7 +92,6 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
                 .subscribe(
                         // onNext
                         albums -> {
-                            Log.i("--->",albums.get(0).getTitle()+"");
                             processAlbum(albums);
                             albumsView.setLoadingIndicator(false);
                         },
@@ -109,6 +110,26 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
         }
     }
 
+
+    private void getSelectedUser(){
+        compositeDisposable.add(repository
+                .getUser(Integer.parseInt(userId))
+                .subscribeOn(schedulerProvider.computation())
+                .observeOn(schedulerProvider.ui())
+                .subscribe(
+                        // onNext
+                        this::provideHeaderData,
+                        // onError
+                        throwable -> {
+                        },
+                        // onCompleted
+                        () -> albumsView.setLoadingIndicator(false)));
+    }
+
+    private void provideHeaderData(@NonNull User user) {
+        albumsView.showHeader(user);
+    }
+
     private void processEmptyAlbums() {
         albumsView.showNoList();
     }
@@ -117,8 +138,6 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
     public void openPhotos(@NonNull Album requestedAlbum) {
         checkNotNull(requestedAlbum, "requestedAlbum cannot be null!");
         if (albumsView != null) {
-
-            Log.e("--------->", requestedAlbum.getId()+"-");
             albumsView.showPhotos(requestedAlbum.getId());
         }
     }
@@ -127,6 +146,7 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
     public void generateView(AlbumsContract.View view) {
         albumsView = view;
         reload(false);
+
     }
 
     @Override

@@ -6,7 +6,6 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,16 +13,12 @@ import android.widget.BaseAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.MemoryPolicy;
 import com.squareup.picasso.Picasso;
 import com.wisekiddo.liquid.R;
 import com.wisekiddo.liquid.data.model.Photo;
-import com.wisekiddo.liquid.feature.photos.PhotosActivity;
-import com.wisekiddo.liquid.feature.photos.PhotosContract;
-import com.wisekiddo.liquid.feature.photos.PhotosRefreshLayout;
 import com.wisekiddo.liquid.root.ActivityScoped;
 
 import java.util.ArrayList;
@@ -38,7 +33,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Created by ronald on 28/4/18.
  *
- * Main UI for the user detail screen.
+ * Main UI for the user_cardview detail screen.
  */
 
 @ActivityScoped
@@ -229,16 +224,13 @@ public class PhotosFragment extends DaggerFragment implements PhotosContract.Vie
             View rowView = view;
             if (rowView == null) {
                 LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-                rowView = inflater.inflate(R.layout.photo, viewGroup, false);
+                rowView = inflater.inflate(R.layout.photo_cardview, viewGroup, false);
             }
 
             final Photo photo = getItem(i);
 
             TextView titleView = rowView.findViewById(R.id.title);
             titleView.setText(photo.getTitle().trim());
-
-            TextView descriptionView = rowView.findViewById(R.id.description);
-            descriptionView.setText(photo.getTitle());
 
             ImageView imageView = rowView.findViewById(R.id.image);
             Picasso.get().load(photo.getUrl())

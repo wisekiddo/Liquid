@@ -3,25 +3,31 @@ package com.wisekiddo.liquid.feature.albums;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
-import android.widget.ImageView;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.LinearLayout;
-import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.Picasso;
 import com.wisekiddo.liquid.R;
 import com.wisekiddo.liquid.data.model.Album;
+import com.wisekiddo.liquid.data.model.User;
 import com.wisekiddo.liquid.feature.photos.PhotosActivity;
 import com.wisekiddo.liquid.root.ActivityScoped;
+import com.wisekiddo.liquid.util.RecyclerTouchListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +41,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 /**
  * Created by ronald on 28/4/18.
  *
- * Main UI for the user detail screen.
+ * Main UI for the user_cardview detail screen.
  */
 
 @ActivityScoped
@@ -47,7 +53,7 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
     private AlbumAdapter listAdapter;
     private View noView;
     private TextView mNoMainView;
-    private LinearLayout linearLayout;
+    private RelativeLayout relativeLayout;
     private TextView mFilteringLabelView;
 
     @Inject
@@ -55,21 +61,11 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
         // Requires empty public constructor
     }
 
-    public interface AlbumListener {
-        void onClickAlbum(Album clickAlbum);
-    }
-
-    AlbumListener albumListener = new AlbumListener() {
-        @Override
-        public void onClickAlbum(Album clickedAlbum) {
-            presenter.openPhotos(clickedAlbum);
-        }
-    };
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        listAdapter = new AlbumAdapter(new ArrayList<Album>(0), albumListener);
+        listAdapter = new AlbumAdapter(new ArrayList<Album>(0));
     }
 
     @Override
@@ -94,16 +90,68 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.albums_fragment, container, false);
 
+       // initCollapsingToolbar(root);
         // Set up users view
-        ListView listView = root.findViewById(R.id.albums_list);
-        listView.setAdapter(listAdapter);
+        //ListView listView = root.findViewById(R.id.albums_list);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext());
+
+        RecyclerView recyclerView = root.findViewById(R.id.albums_list);
+        recyclerView.setHasFixedSize(false);
+        recyclerView.setAdapter(listAdapter);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.addItemDecoration(new DividerItemDecoration(getContext(), LinearLayoutManager.VERTICAL));
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.addOnItemTouchListener(new RecyclerTouchListener(getContext(), recyclerView, new RecyclerTouchListener.ClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                if(position > 0) {
+                    Album album = listAdapter.albumList.get(position - 1);
+                    presenter.openPhotos(album);
+                }
+            }
+
+            @Override
+            public void onLongClick(View view, int position) {
+                //For future use
+            }
+        }));
+
+        final CollapsingToolbarLayout collapsingToolbar = getActivity().findViewById(R.id.collapsing_toolbar);
+        // collapsingToolbar.setTitle(" ");
+        AppBarLayout appBarLayout = getActivity().findViewById(R.id.appbar);
+//        appBarLayout.setExpanded(true, true);
+        Toolbar toolbar = getActivity().findViewById(R.id.toolbar);
+
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                if(recyclerView.getChildViewHolder(recyclerView.getChildAt(0)).getLayoutPosition()>0){
+
+                    toolbar.animate().translationY(-toolbar.getBottom()).setInterpolator(new AccelerateInterpolator()).start();
+
+                   // appBarLayout.setExpanded(false, true);
+
+                }else{
+                   // appBarLayout.setExpanded(true, true);
+
+                }
+            }
+        });
+
         //mFilteringLabelView = root.findViewById(R.id.filteringLabel);
-        linearLayout = root.findViewById(R.id.albumsLayout);
+        relativeLayout = getActivity().findViewById(R.id.albumsLayout);
 
         // Set up  no users view
         noView = root.findViewById(R.id.noAlbums);
         mNoMainView = root.findViewById(R.id.noAlbumsMain);
-
 
         // Set up progress indicator
         final AlbumsRefreshLayout swipeRefreshLayout = root.findViewById(R.id.refresh_layout);
@@ -113,7 +161,7 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
                 ContextCompat.getColor(getActivity(), R.color.colorPrimaryDark)
         );
         // Set the scrolling view in the custom SwipeRefreshLayout.
-        swipeRefreshLayout.setScrollUpChild(listView);
+        //swipeRefreshLayout.setScrollUpChild(listView);
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -126,7 +174,6 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
 
         return root;
     }
-
 
 
     @Override
@@ -148,13 +195,24 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
 
     @Override
     public void showAlbums(List<Album> albums) {
-
-        Log.i("---SHOWALBUMS","0000");
         listAdapter.replaceData(albums);
-
-        linearLayout.setVisibility(View.VISIBLE);
+        relativeLayout.setVisibility(View.VISIBLE);
         noView.setVisibility(View.GONE);
     }
+
+    @Override
+    public void showHeader(User user){
+        String strName, strAddress, strEmail, strTitle;
+        strName = user.getName() + "("+user.getUsername()+")";
+        strAddress = user.getAddress().getStreet() + " " +
+                user.getAddress().getSuite() + " " +
+                user.getAddress().getCity() + " " +
+                user.getAddress().getZipcode();
+        strEmail = user.getEmail();
+        strTitle = "Albums";
+        listAdapter.headerViewHolder.setValues(strName,strAddress,strEmail,strTitle);
+    }
+
 
     @Override
     public void showNoList() {
@@ -166,7 +224,7 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
     }
 
     private void showNoAlbumsViews(String mainText, int iconRes, boolean showAddView) {
-        linearLayout.setVisibility(View.GONE);
+        relativeLayout.setVisibility(View.GONE);
         noView.setVisibility(View.VISIBLE);
         mNoMainView.setText(mainText);
     }
@@ -189,22 +247,31 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
 
 
 
+    //*********************//
+    //**********Adapter***//
 
+    public class AlbumAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+        private List<Album> albumList;
+        private static final int TYPE_HEADER = 0;
+        private static final int TYPE_ITEM = 1;
+        private HeaderViewHolder headerViewHolder;
 
+        @Override
+        public int getItemViewType(int position) {
+            if (isPositionHeader(position)) {
+                return TYPE_HEADER;
 
+            }
+            return TYPE_ITEM;
+        }
 
+        private boolean isPositionHeader(int position) {
+            return position == 0;
+        }
 
-    private static class AlbumAdapter extends BaseAdapter {
-
-        private List<Album> mAlbums;
-        private AlbumListener mAlbumListener;
-        private static final String BASE_IMAGE_URL = "http://media.redmart.com/newmedia/200p";
-
-
-        public AlbumAdapter(List<Album> albums, AlbumListener albumListener) {
-            setList(albums);
-            mAlbumListener = albumListener;
+        private boolean isPositionFooter(int position) {
+            return position >= albumList.size();
         }
 
         public void replaceData(List<Album> albums) {
@@ -213,46 +280,79 @@ public class AlbumsFragment extends DaggerFragment implements AlbumsContract.Vie
         }
 
         private void setList(List<Album> albums) {
-            mAlbums = checkNotNull(albums);
+            this.albumList = checkNotNull(albums);
+        }
+        public AlbumAdapter(List<Album> albumList) {
+            this.albumList = albumList;
+        }
+
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
+
+            if (viewType == TYPE_HEADER) {
+                View view = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.album_header, viewGroup, false);
+                headerViewHolder = new HeaderViewHolder(view);
+                return headerViewHolder;
+
+            } else if (viewType == TYPE_ITEM) {
+                View view = LayoutInflater.from(viewGroup.getContext())
+                        .inflate(R.layout.album_cardview, viewGroup, false);
+                return new ItemViewHolder(view);
+            }
+            throw new RuntimeException("NO View Type");
         }
 
         @Override
-        public int getCount() {
-            return mAlbums.size();
+        public void onBindViewHolder(final RecyclerView.ViewHolder holder, final int position) {
+            if (holder instanceof HeaderViewHolder) {
+                //
+            }else if (holder instanceof ItemViewHolder) {
+                Album album = albumList.get(position-1);
+                ((ItemViewHolder) holder).txtTitle.setText(album.getTitle());
+            }
         }
 
         @Override
-        public Album getItem(int i) {
-            return mAlbums.get(i);
+        public int getItemCount() {
+            return albumList.size()+1;
         }
 
-        @Override
-        public long getItemId(int i) {
-            return i;
+        public class ItemViewHolder extends RecyclerView.ViewHolder {
+            public TextView txtTitle;
+
+            private ItemViewHolder(View view) {
+                super(view);
+                txtTitle = view.findViewById(R.id.title);
+            }
         }
 
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-            View rowView = view;
-            if (rowView == null) {
-                LayoutInflater inflater = LayoutInflater.from(viewGroup.getContext());
-                rowView = inflater.inflate(R.layout.album, viewGroup, false);
+        // The ViewHolders for Header, Item and Footer
+        public class HeaderViewHolder extends RecyclerView.ViewHolder {
+            public View View;
+            private TextView txtName;
+            private TextView txtEmail;
+            private TextView txtAdress;
+            private TextView txtTitle;
+
+            public HeaderViewHolder(View view) {
+                super(view);
+                View = view;
+                // add your ui components here like this below
+                txtName = View.findViewById(R.id.name);
+                txtEmail = View.findViewById(R.id.email);
+                txtAdress = View.findViewById(R.id.address);
+                txtTitle = View.findViewById(R.id.title);
             }
 
-            final Album album = getItem(i);
-
-            TextView titleView = rowView.findViewById(R.id.title);
-            titleView.setText(album.getTitle().trim());
-
-            rowView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    mAlbumListener.onClickAlbum(album);
-                }
-            });
-
-            return rowView;
+            public void setValues(String name, String address, String email, String title){
+                txtName.setText(name);
+                txtAdress.setText(address);
+                txtEmail.setText(email);
+                txtTitle.setText(title);
+            }
         }
-    }
 
+    }
 }

@@ -13,9 +13,8 @@ import java.util.List;
 import io.reactivex.Flowable;
 
 /**
- * Created by ronald on 28/4/18.
- *
- * Data Access Object for the album table.
+ * Created by ronald
+ * Data Access Object for the album_cardview table.
  */
 
 @Dao

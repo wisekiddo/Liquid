@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
 apply plugin: 'me.tatarka.retrolambda'
 
 
@@ -13,7 +12,6 @@ android {
         versionName "1.0"
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner'
         buildConfigField "String", "BASE_API_URL", "\"$BASE_API_URL\""
-
     }
     buildTypes {
         release {

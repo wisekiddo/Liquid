@@ -19,7 +19,6 @@ import io.reactivex.disposables.Disposable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-
 /**
  * *Created by ronald on 28/4/18.
  */
@@ -106,7 +105,7 @@ final class UsersPresenter implements UsersContract.Presenter {
     public void openAlbums(@NonNull User requestedUser) {
         checkNotNull(requestedUser, "requestedUser cannot be null!");
         if (usersView != null) {
-            usersView.showAlbums(requestedUser.getId());
+            usersView.showAlbums(requestedUser);
         }
     }
 

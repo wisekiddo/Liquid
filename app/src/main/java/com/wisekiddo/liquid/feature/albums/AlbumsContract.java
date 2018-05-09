@@ -3,6 +3,7 @@ package com.wisekiddo.liquid.feature.albums;
 import android.support.annotation.NonNull;
 
 import com.wisekiddo.liquid.data.model.Album;
+import com.wisekiddo.liquid.data.model.User;
 import com.wisekiddo.liquid.root.BasePresenter;
 import com.wisekiddo.liquid.root.BaseView;
 
@@ -22,6 +23,8 @@ public interface AlbumsContract {
 
         void showAlbums(List<Album> albums);
 
+        void showHeader(User user);
+
         void showPhotos(Integer userId);
 
         void showLoadingError();
@@ -34,7 +37,6 @@ public interface AlbumsContract {
         void reload(boolean forceUpdate);
 
         void openPhotos(@NonNull Album requestedAlbums);
-
 
         void generateView(AlbumsContract.View view);
 
