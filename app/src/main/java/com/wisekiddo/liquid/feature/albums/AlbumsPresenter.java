@@ -40,16 +40,16 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
 
     private boolean firstLoad = true;
 
-    private String taskId;
+    private String albumId;
 
 
     @NonNull
     private CompositeDisposable compositeDisposable;
 
     @Inject
-    AlbumsPresenter(@Nullable String taskId, Repository repository) {
+    AlbumsPresenter(@Nullable String albumId, Repository repository) {
         this.repository = repository;
-        this.taskId = taskId;
+        this.albumId = albumId;
         compositeDisposable = new CompositeDisposable();
     }
 
@@ -77,7 +77,7 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
 
         compositeDisposable.clear();
         Disposable disposable = repository
-                .getAlbums(Integer.parseInt(taskId))
+                .getAlbums(Integer.parseInt(albumId))
                 .flatMap(Flowable::fromIterable)
                 .toList()
                 .subscribeOn(schedulerProvider.io())
@@ -117,6 +117,8 @@ final class AlbumsPresenter implements AlbumsContract.Presenter {
     public void openPhotos(@NonNull Album requestedAlbum) {
         checkNotNull(requestedAlbum, "requestedAlbum cannot be null!");
         if (albumsView != null) {
+
+            Log.e("--------->", requestedAlbum.getId()+"-");
             albumsView.showPhotos(requestedAlbum.getId());
         }
     }

@@ -30,7 +30,7 @@ public interface ApiService {
     Flowable<List<Album>> getAlbums(
             @Query("userId") Integer id);
 
-    @GET("photo")
+    @GET("photos")
     Flowable<List<Photo>> getPhotos(
             @Query("albumId") Integer id);
 }

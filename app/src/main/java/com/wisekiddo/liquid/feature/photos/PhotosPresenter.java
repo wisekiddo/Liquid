@@ -41,16 +41,16 @@ final class PhotosPresenter implements PhotosContract.Presenter {
 
     private boolean firstLoad = true;
 
-    private String taskId;
+    private String albumId;
 
 
     @NonNull
     private CompositeDisposable compositeDisposable;
 
     @Inject
-    PhotosPresenter(@Nullable String taskId, Repository repository) {
+    PhotosPresenter(@Nullable String albumId, Repository repository) {
         this.repository = repository;
-        this.taskId = taskId;
+        this.albumId = albumId;
         compositeDisposable = new CompositeDisposable();
     }
 
@@ -75,10 +75,10 @@ final class PhotosPresenter implements PhotosContract.Presenter {
         }
 
         EspressoIdlingResource.increment(); // App is busy until further notice
-
+        Log.e("----->", albumId+"***");
         compositeDisposable.clear();
         Disposable disposable = repository
-                .getPhotos(Integer.parseInt(taskId))
+                .getPhotos(Integer.parseInt(albumId))
                 .flatMap(Flowable::fromIterable)
                 .toList()
                 .subscribeOn(schedulerProvider.io())
