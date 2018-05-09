@@ -2,6 +2,8 @@ package com.wisekiddo.liquid.root;
 
 import com.wisekiddo.liquid.feature.albums.AlbumsActivity;
 import com.wisekiddo.liquid.feature.albums.AlbumsModule;
+import com.wisekiddo.liquid.feature.photos.PhotosActivity;
+import com.wisekiddo.liquid.feature.photos.PhotosModule;
 import com.wisekiddo.liquid.feature.users.UsersActivity;
 import com.wisekiddo.liquid.feature.users.UsersModule;
 
@@ -21,4 +23,8 @@ public abstract class ActivityBindingModule {
     @ActivityScoped
     @ContributesAndroidInjector(modules = AlbumsModule.class)
     abstract AlbumsActivity albumsActivity();
+
+    @ActivityScoped
+    @ContributesAndroidInjector(modules = PhotosModule.class)
+    abstract PhotosActivity photosActivity();
 }
